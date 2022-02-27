@@ -24,8 +24,10 @@ import warnings
 import logging
 import datetime
 import pytz
-import os 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+import os
+
+os.chdir(os.path.dirname(sys.argv[0]))
+#dir_path = os.path.dirname(os.path.realpath(__file__))
 
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
@@ -36,8 +38,8 @@ logging.basicConfig(
     level=logging.INFO
 )
 logging.captureWarnings(True)
-hdlr = logging.StreamHandler(sys.stdout)
-logging.getLogger().addHandler(hdlr)
+#hdlr = logging.StreamHandler(sys.stdout)
+#logging.getLogger().addHandler(hdlr)
 
 dmyplant2.cred()
 mp = dmyplant2.MyPlant(0)
@@ -50,24 +52,24 @@ try:
         @ property
         def dash(self):
             _dash = dict()
-            _dash['Name'] = self.Name
-            _dash['serialNumber'] = self.serialNumber
-            _dash['Site'] = self.get_property('IB Site Name') 
-            _dash['Engine ID'] = self.get_property('Engine ID')
-            _dash['Design Number'] = self.get_property('Design Number')
-            _dash['Engine Type'] = self.get_property('Engine Type')
-            _dash['Engine Version'] = self.get_property('Engine Version')
-            _dash['Gas type'] = self.get_property('Gas Type')
-            _dash['Country'] = self.get_property('Country')
-            _dash['OPH Engine'] = self.Count_OpHour
-            _dash['OPH Validation'] = self.oph_parts
+            _dash['Name'] = self['Name']
+            _dash['serialNumber'] = self['serialNumber'] #self.serialNumber
+            _dash['Site'] = self['IB Site Name'] #self.get_property('IB Site Name') 
+            _dash['Engine ID'] = self['Engine ID'] #self.get_property('Engine ID')
+            _dash['Design Number'] = self['Design Number'] #self.get_property('Design Number')
+            _dash['Engine Type'] = self['Engine Type'] #self.get_property('Engine Type')
+            _dash['Engine Version'] = self['Engine Version'] #self.get_property('Engine Version')
+            _dash['Gas type'] = self['Gas Type'] #self.get_property('Gas Type')
+            _dash['Country'] = self['Country'] #self.get_property('Country')
+            _dash['OPH Engine'] = self['Count_OpHour'] #self.Count_OpHour
+            _dash['OPH Validation'] = self['oph_parts'] #self.oph_parts
             _dash['P_nom'] = self.Pmech_nominal
             _dash['BMEP'] = self.BMEP
             _dash['LOC'] = self.get_dataItem(
                 'RMD_ListBuffMAvgOilConsume_OilConsumption')
             return _dash
 
-    dval=dmyplant2.Validation.load_def_excel(dir_path+'\Input_validation_dashboard.xlsx', 'Engines', mp) #Loading of validation engine data from excel
+    dval=dmyplant2.Validation.load_def_excel('Input_validation_dashboard.xlsx', 'Engines', mp) #Loading of validation engine data from excel
     vl = dmyplant2.Validation(mp, dval, lengine=myEngine, cui_log=False)
     enginelist=vl.engines
     logging.info('Engine properties loaded')
@@ -79,14 +81,15 @@ except Exception as e:
     #traceback.print_tb(e.__traceback__)
     sys.exit(1)
   
-finally:
-    hdlr.close()
-    logging.getLogger().removeHandler(hdlr)
+#finally:
+#    hdlr.close()
+#    logging.getLogger().removeHandler(hdlr)
 
     #Loading of Variables from Excel automatic creation of variables
 
 
-df_var=pd.read_excel(dir_path+'\Input_validation_dashboard.xlsx', sheet_name='Variables', usecols=['Variable', 'Value']) #loading of relevant excel sheet in DataFrame
+df_var=pd.read_excel('Input_validation_dashboard.xlsx', sheet_name='Variables', usecols=['Variable', 'Value']) #loading of relevant excel sheet in DataFrame
+#df_var=pd.read_excel('Input_validation_dashboard.xlsx', sheet_name='Variables', usecols=['Variable', 'Value']) #loading of relevant excel sheet in DataFrame
 df_var.dropna(inplace=True)
 for i in range(len(df_var)):
     globals()[df_var.Variable.iloc[i]]=df_var.Value.iloc[i]
@@ -347,5 +350,5 @@ if make_tabs:
     #output_notebook() #output in Jupyter Notebook
     starttime_string=starttime_disp.strftime('%y_%m_%d %H_%M')
     endtime_string=endtime_disp.strftime('%y_%m_%d %H_%M')
-    output_file(f'{dir_path}\{validation_name} ({starttime_string} - {endtime_string}).html', title=validation_name) #Output in browser
+    output_file(f'{validation_name} ({starttime_string} - {endtime_string}).html', title=validation_name) #Output in browser
     show(test)

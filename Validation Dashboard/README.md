@@ -26,3 +26,4 @@ Feel free to make a pull request/ issue with your calculations.
 -  1.0: First released version (01.06.21)
 -  1.1: Bugfixes
 -  1.2: Added statistics tab (01.07.21)
+-  1.3: Took it over from Johannes, Dieter (27.2.2022)
